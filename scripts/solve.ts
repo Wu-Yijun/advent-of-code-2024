@@ -12,17 +12,17 @@ try {
   const input = await Deno.readTextFile(inputPath);
   console.log(`Solving day ${day}...`);
 
-  Deno.bench(`Day ${day} - Part One`, (b) => {
-    b.start();
-    partOne(input);
-    b.end();
-  });
+  // Deno.bench(`Day ${day} - Part One`, (b) => {
+  //   b.start();
+  //   partOne(input);
+  //   b.end();
+  // });
 
-  Deno.bench(`Day ${day} - Part Two`, (b) => {
-    b.start();
-    partTwo(input);
-    b.end();
-  });
+  // Deno.bench(`Day ${day} - Part Two`, (b) => {
+  //   b.start();
+  //   partTwo(input);
+  //   b.end();
+  // });
 
   const resultOne = partOne(input);
   const resultTwo = partTwo(input);

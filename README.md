@@ -1,6 +1,7 @@
 # Deno's Advent of Code 2024
 
-> This repo is **MY SOLUTION** for *Deno's Advent of Code 2024*
+> This repo is **MY SOLUTIONS** for *Deno's Advent of Code 2024*.
+> 
 > See [denoland/advent-of-code-2024](https://github.com/denoland/advent-of-code-2024) for the original repo.
 
 ![Advent of Code with Deno](./static/og.png)
