@@ -1,0 +1,7 @@
+data/inputs/**
+data/examples/**
+.vscode/
+
+deno.lock
+Advance-of-Code.md
+.adventofcode.session
