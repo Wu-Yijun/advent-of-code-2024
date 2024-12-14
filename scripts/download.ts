@@ -9,7 +9,6 @@ if (!day) {
 const formattedDay = day.padStart(2, "0");
 
 // Paths for session file and input/puzzle files
-const sessionFilePath = `./.adventofcode.session`;
 const inputFilePath = `data/inputs/day${formattedDay}.txt`;
 const puzzleFilePath = `data/puzzles/day${formattedDay}.md`;
 
@@ -30,16 +29,16 @@ try {
   Deno.exit(1);
 }
 
-// Check if the `.adventofcode.session` file exists
-if (!(await exists(sessionFilePath))) {
-  console.error(
-    `The Advent of Code session file (${sessionFilePath}) does not exist. Please create this file and add your session cookie to download inputs.`
-  );
-  console.error(
-    "Read more about it here: https://github.com/scarvalhojr/aoc-cli"
-  );
-  Deno.exit(1);
-}
+// // Check if the `.adventofcode.session` file exists
+// if (!(await exists(sessionFilePath))) {
+//   console.error(
+//     `The Advent of Code session file (${sessionFilePath}) does not exist. Please create this file and add your session cookie to download inputs.`
+//   );
+//   console.error(
+//     "Read more about it here: https://github.com/scarvalhojr/aoc-cli"
+//   );
+//   Deno.exit(1);
+// }
 
 // Ensure directories exist for input and puzzle files
 await Deno.mkdir("data/inputs", { recursive: true });
@@ -49,6 +48,8 @@ await Deno.mkdir("data/puzzles", { recursive: true });
 const downloadCommand = new Deno.Command("aoc", {
   args: [
     "download",
+    "--day",
+    day,
     "--overwrite",
     "--input-file",
     inputFilePath,
