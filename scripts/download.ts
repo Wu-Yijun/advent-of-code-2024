@@ -1,4 +1,6 @@
-import { exists } from "@std/fs";
+// import { exists } from "@std/fs";
+
+import "./scaffold.ts"
 
 const day = Deno.args[0];
 if (!day) {
