@@ -15,14 +15,14 @@ function read(input: string) {
 }
 
 export function partOne(input: string) {
-  const _data = read(input);
-  // TODO: Implement part one logic here
+  const data = read(input);
+  console.log(data);
   return null;
 }
 
 export function partTwo(input: string) {
-  const _data = read(input);
-  // TODO: Implement part two logic here
+  const data = read(input);
+  console.log(data);
   return null;
 }
 
