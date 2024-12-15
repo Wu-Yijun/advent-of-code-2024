@@ -20,7 +20,7 @@ function read(input: string) {
   return data;
 }
 
-function findMinimalSolution_old(a: number, b: number, c: number) {
+function _findMinimalSolution_old(a: number, b: number, c: number) {
   let minSum = Infinity;
   let bestX = -1;
   let bestY = -1;
@@ -60,8 +60,8 @@ function findMinimalSolution(a: number, b: number, c: number) {
   if (c % gcd !== 0) return "Indeterminate without solution";
   // scale x,y
   const scale = c / gcd;
-  let x = x0 * scale;
-  let y = y0 * scale;
+  const x = x0 * scale;
+  const y = y0 * scale;
   // get steps, solution is x = x + stepX * t, y = y - stepY * t
   const stepX = b / gcd;
   const stepY = a / gcd;

@@ -4,7 +4,7 @@ interface Data {
   size: [number, number];
 }
 
-function log(data: Data) {
+function _log(data: Data) {
   console.log(data.map.map((line) => line.join("")).join("\n"));
   console.log(data.val.map((line) => line.join(" | ")).join("\n"));
   console.log(data.size);

@@ -21,7 +21,7 @@ function read(input: string) {
 }
 
 function get_disk(data: Data): number[] {
-  const disk = Array.from({ length: data.disk_len }, (_, i) => -1);
+  const disk = Array.from({ length: data.disk_len }, (_) => -1);
   let offset = 0;
   for (let i = 0; i < data.files.length; i++) {
     for (let j = 0; j < data.files[i]; j++) {

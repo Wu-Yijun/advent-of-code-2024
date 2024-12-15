@@ -81,7 +81,7 @@ Deno.test("Part One", () => {
 });
 
 Deno.test("Part Two", () => {
-  const result = Deno.readTextFileSync(`data/examples/day11.txt`);
+  // const result = Deno.readTextFileSync(`data/examples/day11.txt`);
   assertEquals(partTwo("125 17", 6), BigInt(22)); // Replace null with expected result for Part Two
   assertEquals(partTwo("125 17", 25), BigInt(55312)); // Replace null with expected result for Part Two
 });

@@ -37,7 +37,7 @@ function add_antinode(
   for (let i = 1; i < antennas.length; i++) {
     for (let j = 0; j < i; j++) {
       // let pos1 = 2 * antennas[i] - antennas[j];
-      let pos1 = [
+      const pos1 = [
         2 * antennas[i][0] - antennas[j][0],
         2 * antennas[i][1] - antennas[j][1],
       ];
@@ -47,7 +47,7 @@ function add_antinode(
         map[pos1[0]][pos1[1]] = "#";
       }
       // let pos2 = 2 * antennas[j] - antennas[i];
-      let pos2 = [
+      const pos2 = [
         2 * antennas[j][0] - antennas[i][0],
         2 * antennas[j][1] - antennas[i][1],
       ];

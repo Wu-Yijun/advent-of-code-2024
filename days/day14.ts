@@ -116,6 +116,6 @@ Deno.test("Part One", () => {
 });
 
 Deno.test("Part Two", () => {
-  const result = Deno.readTextFileSync(`data/examples/day14.txt`);
+  // const result = Deno.readTextFileSync(`data/examples/day14.txt`);
   // assertEquals(partTwo(result), null); // Replace null with expected result for Part Two
 });
