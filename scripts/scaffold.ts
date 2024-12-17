@@ -32,8 +32,12 @@ try {
 } catch (_err) {
   console.error("day File already exists, aborting.");
 }
+try {
+  await Deno.writeTextFile(examplePath, "", { createNew: true, append: false });
+} catch (_err) {
+  console.error("example File already exists, aborting.");
+}
 await Deno.writeTextFile(inputPath, "", { create: true, append: false });
-await Deno.writeTextFile(examplePath, "", { create: true, append: false });
 
 console.log(`Scaffolded files for day ${day}:`);
 console.log(`- ${dayPath}`);
