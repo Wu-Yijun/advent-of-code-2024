@@ -24,7 +24,14 @@ let template = await Deno.readTextFile(templatePath);
 template = template.replace(/%DAY_NUMBER%/g, formattedDay);
 
 // Write the scaffolded files, ensuring the template overwrites any existing content
-await Deno.writeTextFile(dayPath, template, { create: true, append: false });
+try {
+  await Deno.writeTextFile(dayPath, template, {
+    createNew: true,
+    append: false,
+  });
+} catch (_err) {
+  console.error("day File already exists, aborting.");
+}
 await Deno.writeTextFile(inputPath, "", { create: true, append: false });
 await Deno.writeTextFile(examplePath, "", { create: true, append: false });
 
