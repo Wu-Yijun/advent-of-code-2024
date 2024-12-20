@@ -5,10 +5,6 @@ interface Data {
   target: [number, number];
 }
 
-const PARAMS = {
-  less: 100,
-};
-
 function read(input: string) {
   const data: Data = {
     map: input.trim().split("\n").map((x) => x.trim().split("")),
@@ -32,23 +28,20 @@ function read(input: string) {
   return data;
 }
 
-function dfs(
-  data: Data,
-  max_time = 10000,
-): [number, [[number, number], [number, number]]] {
+function dfs(map: string[][], x: number, y: number) {
   const scores = Array.from(
-    { length: data.size[0] },
-    () => Array.from({ length: data.size[1] }, () => Infinity),
+    { length: map.length },
+    () => Array.from({ length: map[0].length }, () => Infinity),
   );
   // [x, y, score]
-  const queue = [[data.pos[0], data.pos[1], 0]];
+  const queue = [[x, y, 0]];
   while (queue.length) {
     const [x, y, score] = queue.shift()!;
-    if (data.map[x][y] === "#") {
+    if (map[x][y] === "#") {
       // hit walls
       continue;
     }
-    if (scores[x][y] <= score || score > max_time) {
+    if (scores[x][y] <= score) {
       continue;
     }
     scores[x][y] = score;
@@ -58,112 +51,170 @@ function dfs(
     queue.push([x, y + 1, score + 1]);
     queue.push([x, y - 1, score + 1]);
   }
-  // console.log(scores);
-  if (scores[data.target[0]][data.target[1]] === Infinity) {
-    return [Infinity, [[0, 0], [0, 0]]];
-  }
-  const pass = best_path(data, scores);
-  return [scores[data.target[0]][data.target[1]], pass];
+  return scores;
 }
 
-// after dfs, search the decreasing 1 path from end to start
-function best_path(
-  data: Data,
-  score: number[][],
-): [[number, number], [number, number]] {
-  let [x, y] = data.target;
-  let [last_x, last_y] = [x, y];
-  const pass: [[number, number], [number, number]] = [[-1, -1], [-1, -1]];
-  let skip = false;
-  while (score[x][y] > 0) {
-    if (data.map[x][y] === "1" || data.map[x][y] === "2") {
-      if (!skip) {
-        skip = true;
-        pass[0] = [last_x, last_y];
+// return number of possible cheats
+function dfs_cheat(
+  map: string[][],
+  score: number,
+  targets: number[][],
+  x: number,
+  y: number,
+  max_step = 20,
+) {
+  if (map[x][y] === "#") {
+    return 0;
+  }
+  // [x, y, score, step]
+  // const queue = [[x, y, score, 0]];
+  const queue: [number, number, number, number][] = [];
+  if (map[x + 1][y] === "#") queue.push([x + 1, y, score, 0]);
+  if (map[x - 1][y] === "#") queue.push([x - 1, y, score, 0]);
+  if (map[x][y + 1] === "#") queue.push([x, y + 1, score, 0]);
+  if (map[x][y - 1] === "#") queue.push([x, y - 1, score, 0]);
+
+  const size = [map.length, map[0].length];
+  const scores = Array.from(
+    { length: size[0] },
+    () => Array.from({ length: size[1] }, () => Infinity),
+  );
+  // x << 16 | y
+  const valid_pos = new Set<number>();
+  while (queue.length > 0) {
+    const [x, y, score, step] = queue.shift()!;
+    if (x < 0 || x >= size[0] || y < 0 || y >= size[1]) {
+      // hit walls
+      continue;
+    }
+    if (step > max_step) {
+      continue;
+    }
+    if (map[x][y] !== "#") {
+      // move out
+      if (score < targets[x][y]) {
+        valid_pos.add(x << 16 | y);
       }
-    } else if (skip) {
-      pass[1] = [x, y];
-      skip = false;
+      continue;
     }
-    last_x = x;
-    last_y = y;
-    if (score[x + 1][y] === score[x][y] - 1) {
-      x++;
-    } else if (score[x - 1][y] === score[x][y] - 1) {
-      x--;
-    } else if (score[x][y + 1] === score[x][y] - 1) {
-      y++;
-    } else if (score[x][y - 1] === score[x][y] - 1) {
-      y--;
+    if (scores[x][y] <= score) {
+      continue;
     }
+    scores[x][y] = score;
+    // move forward by increasing score by 1
+    queue.push([x + 1, y, score + 1, step + 1]);
+    queue.push([x - 1, y, score + 1, step + 1]);
+    queue.push([x, y + 1, score + 1, step + 1]);
+    queue.push([x, y - 1, score + 1, step + 1]);
   }
-  return pass;
+  // if (valid_pos.size > 0) {
+  //   console.log(
+  //     "valid",
+  //     x,
+  //     y,
+  //     score,
+  //   );
+  //   valid_pos.values().forEach((x) => console.log([x >> 16, x & 0xffff]));
+  // }
+  return valid_pos.size;
 }
 
-function valid(p: [number, number]) {
-  return p[0] > 0 && p[1] > 0;
-}
-
-export function partOne(input: string) {
+export function partOne(input: string, threshold = 100) {
   const data = read(input);
-  console.log("size", data.size);
-  console.log("s", data.pos, "e", data.target);
-  console.log(data.map.map((x) => x.join("")).join("\n"));
-  const time0 = dfs(data)[0];
-  console.log("time0", time0);
+  // console.log("size", data.size);
+  // console.log("s", data.pos, "e", data.target);
+  // console.log(data.map.map((x) => x.join("")).join("\n"));
+  const scores = dfs(data.map, data.pos[0], data.pos[1]);
+  const time = scores[data.target[0]][data.target[1]] - threshold;
+  const inv_score = dfs(data.map, data.target[0], data.target[1]);
+  // const counts = Array.from({ length: 90 }, (_) => 0);
   let num = 0;
   for (let x = 1; x < data.size[0] - 1; x++) {
     for (let y = 1; y < data.size[1] - 1; y++) {
       if (data.map[x][y] !== "#") continue;
-      data.map[x][y] = "1";
-      // if (y + 1 < data.size[1] - 1 && data.map[x][y + 1] === "#") {
-      //   data.map[x][y + 1] = "2";
-      //   const [time, [p1, p2]] = dfs(data, time0);
-      //   data.map[x][y + 1] = "#";
-      //   if (time < time0 && valid(p1) && valid(p2)) {
-      //     console.log("timY", time0 - time, x, y, p1, p2);
-      //     // console.log(data.map.map((x) => x.join("")).join("\n"));
-      //     num++;
-      //   }
-      // }
-      // if (x + 1 < data.size[0] - 1 && data.map[x + 1][y] === "#") {
-      //   data.map[x + 1][y] = "2";
-      //   const [time, [p1, p2]] = dfs(data, time0);
-      //   data.map[x + 1][y] = "#";
-      //   if (time < time0 && valid(p1) && valid(p2)) {
-      //     console.log("timX", time0 - time, x, y, p1, p2);
-      //     console.log(data.map.map((x) => x.join("")).join("\n"));
-      //     num++;
-      //   }
-      // }
-      const [time, [p1, p2]] = dfs(data, time0);
-      // console.log(data.map.map((x) => x.join("")).join("\n"));
-      data.map[x][y] = "#";
-      if (time < time0 && valid(p1) && valid(p2)) {
-        console.log("time", time0 - time, x, y, p1, p2);
-        num++;
+      const score = Math.min(
+        scores[x][y - 1],
+        scores[x][y + 1],
+        scores[x - 1][y],
+        scores[x + 1][y],
+      );
+      if (score + inv_score[x + 1][y] + 2 <= time) {
+        num += 1;
+        // counts[score + inv_score[x + 1][y] + 2] += 1;
+        // console.log(score + inv_score[x + 1][y], "x+1", x, y);
+      }
+      if (score + inv_score[x - 1][y] + 2 <= time) {
+        num += 1;
+        // counts[score + inv_score[x - 1][y] + 2] += 1;
+        // console.log(score + inv_score[x - 1][y], "x-1", x, y);
+      }
+      if (score + inv_score[x][y + 1] + 2 <= time) {
+        num += 1;
+        // counts[score + inv_score[x][y + 1] + 2] += 1;
+        // console.log(score + inv_score[x][y + 1], "y+1", x, y);
+      }
+      if (score + inv_score[x][y - 1] + 2 <= time) {
+        num += 1;
+        // counts[score + inv_score[x][y - 1] + 2] += 1;
+        // console.log(score + inv_score[x][y - 1], "y-1", x, y);
       }
     }
   }
-  console.log(data.map.map((x) => x.join("")).join("\n"));
+  console.log(num);
+  // console.log(counts);
   return num;
 }
 
-export function partTwo(input: string) {
+export function partTwo(input: string, threshold = 100, max_step = 19) {
   const data = read(input);
-  console.log("size", data.size);
-  // console.log(data.map.map((x) => x.join("")).join("\n"));
-  dfs(data);
-  best_path(data);
-  let num = 0;
+  const scores = dfs(data.map, data.pos[0], data.pos[1]);
+  const time = scores[data.target[0]][data.target[1]];
+  const target_score = dfs(data.map, data.target[0], data.target[1]);
   for (let x = 0; x < data.size[0]; x++) {
     for (let y = 0; y < data.size[1]; y++) {
-      if (data.map[x][y] === "O") {
-        num++;
+      if (target_score[x][y] !== Infinity) {
+        target_score[x][y] = time - target_score[x][y];
       }
     }
   }
-  console.log(data.map.map((x) => x.join("")).join("\n"));
+  // console.log(
+  //   scores.map((x) => x.map((x) => x === Infinity ? -1 : x).join("\t")).join(
+  //     "\n",
+  //   ),
+  // );
+  // console.log("target");
+  // console.log(
+  //   target_score.map((x) => x.map((x) => x === Infinity ? -1 : x).join("\t"))
+  //     .join("\n"),
+  // );
+  let num = 0;
+  for (let x = 0; x < data.size[0]; x++) {
+    for (let y = 0; y < data.size[1]; y++) {
+      if (data.map[x][y] === "#") {
+        continue;
+      }
+      const score = scores[x][y] + threshold - 1;
+      const max_step_x = max_step + 1;
+      for (let dx = -max_step_x; dx <= max_step_x; dx++) {
+        const max_step_y = max_step_x - Math.abs(dx);
+        for (let dy = -max_step_y; dy <= max_step_y; dy++) {
+          if (
+            (x + dx < 0 || x + dx >= data.size[0]) ||
+            (y + dy < 0 || y + dy >= data.size[1]) ||
+            (dx === 0 && dy === 0) ||
+            (data.map[x + dx][y + dy] === "#")
+          ) {
+            continue;
+          }
+          const step = Math.abs(dx) + Math.abs(dy);
+          if (score + step < target_score[x + dx][y + dy]) {
+            num += 1;
+          }
+        }
+      }
+    }
+  }
+  console.log(num);
   return num;
 }
 
@@ -171,12 +222,15 @@ import { assertEquals } from "@std/assert";
 
 Deno.test("Part One", () => {
   const result1 = Deno.readTextFileSync(`data/examples/day20.txt`);
-  assertEquals(partOne(result1), 0); // Replace null with expected result for Part One
+  assertEquals(partOne(result1, 1), 44); // Replace null with expected result for Part One
 });
 
 Deno.test("Part Two", () => {
-  const result1 = Deno.readTextFileSync(`data/examples/day16.txt`);
-  assertEquals(partTwo(result1), 45); // Replace null with expected result for Part One
-  const result2 = Deno.readTextFileSync(`data/examples/day16.2.txt`);
-  assertEquals(partTwo(result2), 64); // Replace null with expected result for Part One
+  const result1 = Deno.readTextFileSync(`data/examples/day20.txt`);
+  assertEquals(partTwo(result1, 1, 1), 44); // Replace null with expected result for Part One
+  assertEquals(partTwo(result1, 53, 20), 285-32-31); // Replace null with expected result for Part One
+  assertEquals(partTwo(result1, 52, 20), 285-32); // Replace null with expected result for Part One
+  assertEquals(partTwo(result1, 51, 20), 285-32); // Replace null with expected result for Part One
+  assertEquals(partTwo(result1, 50, 20), 285); // Replace null with expected result for Part One
+  // 32+31+29+39+25+23+20+19+12+14+12+22+4+3=285
 });
