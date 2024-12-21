@@ -1,5 +1,5 @@
-data/inputs/**
-data/examples/**
+# data/inputs/**
+# data/examples/**
 .vscode/
 
 deno.lock
