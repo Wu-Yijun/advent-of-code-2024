@@ -84,7 +84,7 @@ function find_connected_tuple_all_bad(
   return result;
 }
 
-function partTwoBad(input: string) {
+function _partTwoBad(input: string) {
   const data = read(input);
   const link0 = find_connected_tuple3(data.maps);
   const map = new Map<number, Set<number>>();
@@ -111,6 +111,45 @@ function partTwoBad(input: string) {
   return res;
 }
 
+function born_kerbosch(
+  graph: Map<number, Set<number>>,
+  R: Set<number> = new Set(),
+  P: Set<number> = new Set(graph.keys()),
+  X: Set<number> = new Set(),
+): Set<number>[] {
+  const results: Set<number>[] = [];
+  if (P.size === 0 && X.size === 0) {
+    // Found a maximal clique, add it to results
+    results.push(new Set(R));
+    return results;
+  }
+  // Choose a pivot node to improve performance (this can be optimized)
+  const pivot = Array.from(P).concat(Array.from(X)).reduce((maxNode, node) =>
+    (graph.get(node)?.size ?? 0) > (graph.get(maxNode)?.size ?? 0)
+      ? node
+      : maxNode
+  );
+  // Explore the possible nodes in P that are not adjacent to the pivot
+  for (const node of Array.from(P)) {
+    if (!graph.get(pivot)?.has(node)) {
+      // Recursive call with updated sets
+      const newR = new Set(R);
+      newR.add(node);
+      const newP = new Set(
+        [...P].filter((neighbor) => graph.get(node)?.has(neighbor)),
+      );
+      const newX = new Set(
+        [...X].filter((neighbor) => graph.get(node)?.has(neighbor)),
+      );
+      results.push(...born_kerbosch(graph, newR, newP, newX));
+      P.delete(node);
+      X.add(node);
+    }
+  }
+
+  return results;
+}
+
 export function partOne(input: string) {
   const data = read(input);
   // console.log(data);
@@ -131,7 +170,14 @@ export function partOne(input: string) {
 }
 
 export function partTwo(input: string) {
-  return partTwoBad(input);
+  // return _partTwoBad(input);
+  const data = read(input);
+  const clique = born_kerbosch(data.maps);
+  // console.log(clique);
+  const maxClique = clique.reduce((max, c) => (c.size > max.size ? c : max));
+  const res = Array.from(maxClique).sort((a, b) => a - b).map((x) => to_str(x)).join(",");
+  // console.log(res);
+  return res;
 }
 
 import { assertEquals } from "@std/assert";
