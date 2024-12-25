@@ -1,6 +1,8 @@
 # Deno's Advent of Code 2024
 
 > This repo is **MY SOLUTIONS** for *Deno's Advent of Code 2024*. And you can find the solutions in `./days/day{DAY}.ts`.
+>
+> From day01 to day25 everyday's solution is completed.
 > 
 > See [denoland/advent-of-code-2024](https://github.com/denoland/advent-of-code-2024) for the original repo.
 
