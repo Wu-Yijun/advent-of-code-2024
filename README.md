@@ -6,6 +6,10 @@
 > 
 > See [denoland/advent-of-code-2024](https://github.com/denoland/advent-of-code-2024) for the original repo.
 
+> Here are they prizes I've received: All stickers except the elite one!
+>
+> ![My Prizes](./static/my-prizes.jpg)
+
 ![Advent of Code with Deno](./static/og.png)
 
 > Participate in Advent of Code 2024 using Deno and win prizes!
